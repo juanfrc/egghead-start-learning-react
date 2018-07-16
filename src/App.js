@@ -264,42 +264,104 @@ import React from 'react';
 // export default App
 
 // Video 14 React Components from Arrays of Data
+// class App extends React.Component {
+//   constructor() {
+//     super();
+//     this.state = {items: []}
+//   }
+//
+//   componentWillMount(){
+//     fetch( 'https://swapi.co/api/people/?format=json')
+//       .then( response => response.json() )
+//       .then( ({results: items}) => this.setState({items}))
+//   }
+//
+//   filter(e) {
+//     this.setState({filter: e.target.value})
+//   }
+//
+//   render() {
+//     let items = this.state.items
+//     if (this.state.filter) {
+//       items = items.filter( item =>
+//         item.name.toLowerCase()
+//         .includes(this.state.filter.toLowerCase()))
+//     }
+//
+//     return (
+//       <div>
+//         <input typw="text"
+//          onChange={this.filter.bind(this)}/>
+//         {items.map(item =>
+//           <Person key={item.name} person={item}/> )
+//         }
+//       </div>
+//     )
+//   }
+// }
+//
+// const Person = (props) => <h4>{ props.person.name }</h4>
+//
+// export default App
 
-class App extends React.Component {
+
+// Video 15 Higher order components
+
+const HOC = (InnerComponent) => class extends React.Component {
   constructor() {
     super();
-    this.state = {items: []}
+    this.state = {count: 0}
   }
 
-  componentWillMount(){
-    fetch( 'https://swapi.co/api/people/?format=json')
-      .then( response => response.json() )
-      .then( ({results: items}) => this.setState({items}))
+  update() {
+    this.setState({count: this.state.count + 1})
   }
 
-  filter(e) {
-    this.setState({filter: e.target.value})
+  componentWillMount() {
+    console.log('Will mount')
   }
 
   render() {
-    let items = this.state.items
-    if (this.state.filter) {
-      items = items.filter( item =>
-        item.name.toLowerCase()
-        .includes(this.state.filter.toLowerCase()))
-    }
+    return (
+      <InnerComponent
+        {...this.props}
+        {...this.state}
+        update={this.update.bind(this)}
+        />
+    )
+  }
+}
 
+class App extends React.Component {
+  render() {
     return (
       <div>
-        <input typw="text"
-         onChange={this.filter.bind(this)}/>
-        {items.map(item =>
-          <Person key={item.name} person={item}/> )
-        }
+        <Button>button</Button>
+        <hr/>
+        <LabelHOC>label</LabelHOC>
       </div>
     )
   }
 }
 
-const Person = (props) => <h4>{ props.person.name }</h4>
+const Button = HOC((props) =>
+  <button onClick={props.update}>{props.children} - {props.count}</button>
+)
+
+class Label extends React.Component {
+  componentWillMount() {
+    console.log('Label Will mount')
+  }
+
+  render() {
+    return (
+      <label onMouseMove={this.props.update}>
+        {this.props.children} - {this.props.count}
+      </label>
+    )
+  }
+}
+
+const LabelHOC = HOC(Label)
+
 export default App
