@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+// import ReactDOM from 'react-dom';
 // import PropTypes from 'prop-types';
 
 // Create as a stateless component
@@ -224,41 +224,82 @@ import ReactDOM from 'react-dom';
 
 
 // Video 13 React Components updates when new Props are received
+// class App extends React.Component {
+//   constructor() {
+//     super();
+//     this.state = {increasing: false}
+//   }
+//
+//   update() {
+//     ReactDOM.render(<App
+//       val={this.props.val + 1}/>,
+//       document.getElementById('root')
+//     )
+//   }
+//
+//   componentWillReceiveProps(nextProps) {
+//     this.setState({increasing: nextProps.val > this.props.val})
+//   }
+//
+//   shouldComponentUpdate(nextProps, nextState) {
+//     return nextProps.val % 5 === 0;
+//   }
+//
+//   render() {
+//     console.log(this.state.increasing)
+//     return (
+//       <button onClick={this.update.bind(this)}>
+//         {this.props.val}
+//       </button>
+//     )
+//   }
+//
+//   componentDidUpdate(prevProps, prevState) {
+//     console.log(`prevProps: ${prevProps.val}`)
+//   }
+// }
+//
+// App.defaultProps = {val: 0}
+//
+// export default App
+
+// Video 14 React Components from Arrays of Data
+
 class App extends React.Component {
   constructor() {
     super();
-    this.state = {increasing: false}
+    this.state = {items: []}
   }
 
-  update() {
-    ReactDOM.render(<App
-      val={this.props.val + 1}/>,
-      document.getElementById('root')
-    )
+  componentWillMount(){
+    fetch( 'https://swapi.co/api/people/?format=json')
+      .then( response => response.json() )
+      .then( ({results: items}) => this.setState({items}))
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({increasing: nextProps.val > this.props.val})
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.val % 5 === 0;
+  filter(e) {
+    this.setState({filter: e.target.value})
   }
 
   render() {
-    console.log(this.state.increasing)
-    return (
-      <button onClick={this.update.bind(this)}>
-        {this.props.val}
-      </button>
-    )
-  }
+    let items = this.state.items
+    if (this.state.filter) {
+      items = items.filter( item =>
+        item.name.toLowerCase()
+        .includes(this.state.filter.toLowerCase()))
+    }
 
-  componentDidUpdate(prevProps, prevState) {
-    console.log(`prevProps: ${prevProps.val}`)
+    return (
+      <div>
+        <input typw="text"
+         onChange={this.filter.bind(this)}/>
+        {items.map(item =>
+          <Person key={item.name} person={item}/> )
+        }
+      </div>
+    )
   }
 }
 
-App.defaultProps = {val: 0}
-
+const Person = (props) => <h4>{ props.person.name }</h4>
 export default App
