@@ -1,7 +1,7 @@
 import React from 'react';
-import './App.css'
-// import ReactDOM from 'react-dom';
-// import PropTypes from 'prop-types';
+import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
+// import './App.css'
 
 // Create as a stateless component
 // const App = () => <h1>Hello stateless</h1>
@@ -441,45 +441,128 @@ import './App.css'
 // export default App
 
 // Video 19 Extend functionality of children Components
+// class App extends React.Component {
+//   render(){
+//     return(
+//       <Buttons>
+//         <button value="A">A</button>
+//         <button value="B">B</button>
+//         <button value="C">C</button>
+//       </Buttons>
+//     )
+//   }
+// }
+//
+// class Buttons extends React.Component {
+//   constructor() {
+//     super();
+//     this.state = {selected: 'None'}
+//   }
+//
+//   selectItem(selected) {
+//     this.setState({selected})
+//   }
+//
+//   render() {
+//     let fn = child =>
+//       React.cloneElement(child, {
+//         onClick: this.selectItem.bind(this, child.props.value)
+//       })
+//
+//     let items = React.Children.map(this.props.children, fn);
+//
+//     return (
+//       <div>
+//         <h2>You have Selected: {this.state.selected}</h2>
+//         {items}
+//       </div>
+//
+//     )
+//   }
+// }
+//
+// export default App
 
+// Video 20 Reusable React Components
 class App extends React.Component {
-  render(){
+  constructor() {
+    super();
+    this.state = {
+      red: 0,
+      blue: 0
+    }
+    this.update = this.update.bind(this)
+  }
+
+  update(e) {
+    this.setState({
+      red: ReactDOM.findDOMNode(this.refs.red.refs.inp).value,
+      blue: ReactDOM.findDOMNode(this.refs.blue.refs.inp).value
+    })
+  }
+
+  render() {
     return(
-      <Buttons>
-        <button value="A">A</button>
-        <button value="B">B</button>
-        <button value="C">C</button>
-      </Buttons>
+      <div>
+        <NumImput
+          ref="red"
+          min={0}
+          max={255}
+          step={1}
+          val={+this.state.red}
+          type='number'
+          label="Red"
+          update={this.update} />
+
+          <NumImput
+            ref="blue"
+            min={0}
+            max={255}
+            step={0.01}
+            val={+this.state.blue}
+            label="Blue"
+            update={this.update} />
+      </div>
     )
   }
 }
 
-class Buttons extends React.Component {
-  constructor() {
-    super();
-    this.state = {selected: 'None'}
-  }
-
-  selectItem(selected) {
-    this.setState({selected})
-  }
-
+class NumImput extends React.Component {
   render() {
-    let fn = child =>
-      React.cloneElement(child, {
-        onClick: this.selectItem.bind(this, child.props.value)
-      })
-
-    let items = React.Children.map(this.props.children, fn);
-
+    let label = this.props.label !== '' ?
+      <label>{this.props.label} - {this.props.val}</label> : ''
     return (
       <div>
-        <h2>You have Selected: {this.state.selected}</h2>
-        {items}
+        <input ref="inp"
+          type={this.props.type}
+          min={this.props.min}
+          max={this.props.max}
+          step={this.props.step}
+          defaultValue={this.props.val}
+          onChange={this.props.update} />
+        {label}
       </div>
-
     )
   }
+}
+
+NumImput.propTypes = {
+  min: PropTypes.number,
+  max: PropTypes.number,
+  step: PropTypes.number,
+  val: PropTypes.number,
+  label: PropTypes.string,
+  update: PropTypes.func.isRequired,
+  type: PropTypes.oneOf(['number', 'range'])
+}
+
+NumImput.defaultProps = {
+  min: 0,
+  max: 0,
+  step: 1,
+  val: 0,
+  label: '',
+  type: 'range'
 }
 
 export default App
